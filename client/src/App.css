@@ -35,3 +35,5 @@ button:disabled { background: #a5b0d6; cursor: not-allowed; }
 .option.wrong { background: #ffe3e3; border-color: #e03131; color: #1c1e21; }
 .missed-list { padding-left: 20px; }
 .missed-list li { margin-bottom: 12px; }
+.quiz-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+button.secondary { background: #e9ecef; color: #1c1e21; }

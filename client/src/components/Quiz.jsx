@@ -1,6 +1,8 @@
 import { useReducer } from "react";
 
-const initialState = { index: 0, selected: null, answers: [], finished: false };
+function init(questions) {
+  return { pool: questions, round: 1, index: 0, selected: null, answers: [], finished: false };
+}
 
 function reducer(state, action) {
   switch (action.type) {
@@ -10,38 +12,50 @@ function reducer(state, action) {
     case "next": {
       if (state.selected === null) return state;
       const answers = [...state.answers, state.selected];
-      if (state.index === action.total - 1) {
+      if (state.index === state.pool.length - 1) {
         return { ...state, answers, finished: true };
       }
-      return { index: state.index + 1, selected: null, answers, finished: false };
+      return { ...state, index: state.index + 1, selected: null, answers };
     }
+    case "retest":
+      return {
+        pool: action.missed,
+        round: state.round + 1,
+        index: 0,
+        selected: null,
+        answers: [],
+        finished: false,
+      };
     case "restart":
-      return initialState;
+      return init(action.questions);
     default:
       return state;
   }
 }
 
 export default function Quiz({ questions }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const total = questions.length;
+  const [state, dispatch] = useReducer(reducer, questions, init);
+  const { pool, round } = state;
+  const total = pool.length;
 
-  if (total === 0) {
+  if (questions.length === 0) {
     return <p className="hint">No quiz questions were generated for this topic.</p>;
   }
 
   if (state.finished) {
-    const results = questions.map((q, i) => ({ q, picked: state.answers[i] }));
+    const results = pool.map((q, i) => ({ q, picked: state.answers[i] }));
     const missed = results.filter(({ q, picked }) => picked !== q.answerIndex);
     const score = total - missed.length;
 
     return (
       <section className="quiz" aria-label="Quiz results">
+        <p className="quiz-progress">Round {round}</p>
         <h3>
           Score: {score} / {total}
         </h3>
+
         {missed.length === 0 ? (
-          <p>Perfect score!</p>
+          <p>{round === 1 ? "Perfect score!" : "You've cleared every question you missed."}</p>
         ) : (
           <>
             <p>Questions you missed:</p>
@@ -57,14 +71,29 @@ export default function Quiz({ questions }) {
             </ul>
           </>
         )}
-        <button type="button" onClick={() => dispatch({ type: "restart" })}>
-          Try again
-        </button>
+
+        <div className="quiz-actions">
+          {missed.length > 0 && (
+            <button
+              type="button"
+              onClick={() => dispatch({ type: "retest", missed: missed.map(({ q }) => q) })}
+            >
+              Re-test missed ({missed.length})
+            </button>
+          )}
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => dispatch({ type: "restart", questions })}
+          >
+            Start over
+          </button>
+        </div>
       </section>
     );
   }
 
-  const q = questions[state.index];
+  const q = pool[state.index];
   const answered = state.selected !== null;
   const isCorrect = state.selected === q.answerIndex;
   const isLast = state.index === total - 1;
@@ -72,7 +101,7 @@ export default function Quiz({ questions }) {
   return (
     <section className="quiz" aria-label="Quiz">
       <p className="quiz-progress">
-        Question {state.index + 1} of {total}
+        {round > 1 && `Re-test round ${round} · `}Question {state.index + 1} of {total}
       </p>
       <h3>{q.question}</h3>
 
@@ -105,7 +134,7 @@ export default function Quiz({ questions }) {
       </div>
 
       {answered && (
-        <button type="button" onClick={() => dispatch({ type: "next", total })}>
+        <button type="button" onClick={() => dispatch({ type: "next" })}>
           {isLast ? "See results" : "Next question"}
         </button>
       )}
