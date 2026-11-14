@@ -23,3 +23,15 @@ button:disabled { background: #a5b0d6; cursor: not-allowed; }
 .flashcard-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; }
 
 @media (prefers-reduced-motion: reduce) { .flashcard-inner { transition: none; } }
+.tabs { display: flex; gap: 8px; margin: 12px 0; }
+.tab { background: #e9ecef; color: #1c1e21; }
+.tab.active { background: #3b5bdb; color: #fff; }
+
+.quiz-progress { color: #555; font-size: 0.9rem; }
+.options { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+.option { background: #fff; color: #1c1e21; border: 1px solid #c4c8ce; text-align: left; }
+.option:disabled { background: #fff; color: #868e96; cursor: default; }
+.option.correct { background: #d3f9d8; border-color: #2f9e44; color: #1c1e21; }
+.option.wrong { background: #ffe3e3; border-color: #e03131; color: #1c1e21; }
+.missed-list { padding-left: 20px; }
+.missed-list li { margin-bottom: 12px; }

@@ -1,4 +1,4 @@
-import Flashcards from "./components/Flashcards";
+import StudySet from "./components/StudySet";
 import InputForm from "./components/InputForm";
 
 import { useStudySet } from "./hooks/useStudySet";
@@ -32,15 +32,7 @@ export default function App() {
         </div>
       )}
 
-      {status === "success" && (
-        <section className="panel">
-        <h2>{data.title}</h2>
-        <p>
-          {data.cards.length} flashcards · {data.questions.length} quiz questions
-        </p>
-        <Flashcards cards={data.cards} />
-      </section>
-)}
+            {status === "success" && <StudySet data={data} />}
     </main>
   );
 }
