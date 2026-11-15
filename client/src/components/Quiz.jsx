@@ -103,6 +103,12 @@ export default function Quiz({ questions }) {
       <p className="quiz-progress">
         {round > 1 && `Re-test round ${round} · `}Question {state.index + 1} of {total}
       </p>
+      <div className="progress-bar" aria-hidden="true">
+        <div
+          className="progress-fill"
+          style={{ width: `${((state.index + (answered ? 1 : 0)) / total) * 100}%` }}
+        />
+      </div>
       <h3>{q.question}</h3>
 
       <div className="options">

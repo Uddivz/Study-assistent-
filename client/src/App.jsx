@@ -1,15 +1,20 @@
-import StudySet from "./components/StudySet";
 import InputForm from "./components/InputForm";
-
+import StudySet from "./components/StudySet";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { useStudySet } from "./hooks/useStudySet";
 import "./App.css";
+
 
 export default function App() {
   const { status, data, error, generate, retry, cancel } = useStudySet();
 
   return (
     <main className="app">
-      <h1>Study Assistant</h1>
+      <header className="app-header">
+        <h1>Study Assistant</h1>
+        <p className="subtitle">Turn your notes into flashcards and a quiz.</p>
+      </header>
+
       <InputForm onSubmit={generate} disabled={status === "loading"} />
 
       {status === "idle" && (
@@ -19,9 +24,12 @@ export default function App() {
       )}
 
       {status === "loading" && (
-        <div className="panel" role="status">
+        <div className="panel loading" role="status">
+          <span className="spinner" aria-hidden="true" />
           <p>Generating your study set…</p>
-          <button type="button" onClick={cancel}>Cancel</button>
+          <button type="button" className="secondary" onClick={cancel}>
+            Cancel
+          </button>
         </div>
       )}
 
@@ -32,7 +40,11 @@ export default function App() {
         </div>
       )}
 
-            {status === "success" && <StudySet data={data} />}
+      {status === "success" && (
+        <ErrorBoundary>
+          <StudySet data={data} />
+        </ErrorBoundary>
+      )}
     </main>
   );
 }
