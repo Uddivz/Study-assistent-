@@ -1,14 +1,17 @@
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
-const SYSTEM_PROMPT = `You are a study assistant. From the user's notes or topic, create:
-- 8 to 12 flashcards (front = question or term, back = concise answer)
-- 5 to 8 multiple-choice questions, each with exactly 4 options and one correct answer
-Use only information that is accurate and relevant to the input. Keep text short.`;
-
+const SYSTEM_PROMPT = `You are a study assistant. First decide whether the user's input contains a real, recognisable topic or study notes.
+- If it is gibberish, random characters, or has no studyable subject: set isStudyable to false, and return an empty title and empty arrays for cards and questions. Never invent a topic.
+- Otherwise set isStudyable to true and create:
+  - 8 to 12 flashcards (front = question or term, back = concise answer)
+  - 5 to 8 multiple-choice questions, each with exactly 4 options and one correct answer
+Use only accurate information that is relevant to the input. Keep text short. Never use placeholder text like "Question 1".`;
 
 const RESPONSE_SCHEMA = {
   type: "OBJECT",
+  propertyOrdering: ["isStudyable", "title", "cards", "questions"],
   properties: {
+    isStudyable: { type: "BOOLEAN" },
     title: { type: "STRING" },
     cards: {
       type: "ARRAY",
@@ -32,9 +35,8 @@ const RESPONSE_SCHEMA = {
       },
     },
   },
-  required: ["title", "cards", "questions"],
+  required: ["isStudyable", "title", "cards", "questions"],
 };
-
 
 export class AppError extends Error {
   constructor(message, status) {
